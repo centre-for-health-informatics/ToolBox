@@ -1,0 +1,394 @@
+/* Defining appropriatness */
+/* Before running this SAS program, the database location should be revised */
+/* In this example, the ACCESS database (PTMSCEDB.MDE) locates in the folder of D:/temp*/
+
+libname mydir 'd:/temp';
+
+%MACRO inputAccessData (out=,datatable=,dbms=,database=);
+  PROC IMPORT OUT= &out 
+              DATATABLE= &datatable 
+              DBMS=&dbms REPLACE;
+       DATABASE=&database; 
+  RUN;
+%MEND inputAccessData;
+
+
+%inputaccessData(out=dataa, datatable="Demog", dbms="ACCESS97",  
+database="D:/temp/PTMSCEDB.mde");
+run;
+%inputaccessData(out=datab, datatable="Inhosp", dbms="ACCESS97",  
+database="D:/temp/PTMSCEDB.mde");
+run;
+%inputaccessData(out=datac, datatable="pressx", dbms="ACCESS97",  
+database="D:/temp/PTMSCEDB.mde");
+run;
+%inputaccessData(out=datad, datatable="preop", dbms="ACCESS97",  
+database="D:/temp/PTMSCEDB.mde");
+run;
+%inputaccessData(out=datae, datatable="surgery", dbms="ACCESS97",  
+database="D:/temp/PTMSCEDB.mde");
+run;
+
+proc sort data=dataa;
+by studyid;
+run;
+proc sort data=datab;
+by studyid;
+run;
+proc sort data=datac;
+by studyid;
+run;
+proc sort data=datad;
+by studyid;
+run;
+proc sort data=datae;
+by studyid;
+run;
+data mydata;
+merge dataa datab datac datad datae;
+by studyid;
+
+if AFRTVsls     = -1   then      AFRTVsls   =1;
+if CABG         = -1   then      CABG       =1;
+if CTAScler     = -1   then      CTAScler   =1;
+if CVAScler     = -1   then      CVAScler   =1;
+if CombPr       = -1   then      CombPr     =1;
+if Death        = -1   then      Death      =1;
+if Dement       = -1   then      Dement     =1;
+
+if Graft        = -1   then      Graft      =1;
+if HemStroke    = -1   then      HemStroke  =1;
+if InrThrmb     = -1   then      InrThrmb   =1;
+if Lifeexp      = -1   then      Lifeexp    =1;
+if MRAScler     = -1   then      MRAScler   =1;
+if Mi           = -1   then      Mi         =1;
+if MyoInf       = -1   then      MyoInf     =1;
+if ORNote       = -1   then      ORNote     =1;
+if PulmEmb      = -1   then      PulmEmb    =1;
+if ReIntub      = -1   then      ReIntub    =1;
+if RedoEnd      = -1   then      RedoEnd    =1;
+if RenalF       = -1   then      RenalF     =1;
+if Shunt        = -1   then      Shunt      =1;
+if Strk         = -1   then      Strk       =1;
+if SubclvStl    = -1   then      SubclvStl  =1;
+if Surgdt       = -1   then      Surgdt     =1;
+if TIA          = -1   then      TIA        =1;
+if TIAout       = -1   then      TIAout     =1;
+if UnAngina     = -1   then      UnAngina   =1;
+if VPCE         = -1   then      VPCE       =1;
+if WoundHem     = -1   then      WoundHem   =1;
+
+if ctstroke in('Both', 'Left', 'Right') then ctinfar=1; else ctinfar=0;
+
+if MRIstroke in('Both', 'Left', 'Right') then MRIinfar=1; else MRIinfar=0;
+
+if substr(uscdlca,1, 6)='Severe' or
+substr(ctanglca,1, 6)='Severe' or
+substr(mranglca,1, 6)='Severe' or
+substr(cvanglca,1, 6)='Severe'
+ then lsevere=1; else lsevere=0;
+
+if substr(uscdrca,1, 6)='Severe' or
+substr(ctangrca,1, 6)='Severe' or
+substr(mrangrca,1, 6)='Severe' or
+substr(cvangrca,1, 6)='Severe'
+ then rsevere=1; else rsevere=0;
+
+if substr(uscdlca,1, 6)='Modera' or
+substr(ctanglca,1, 6)='Modera' or
+substr(mranglca,1, 6)='Modera' or
+substr(cvanglca,1, 6)='Modera'
+ then lmoderat=1; else lmoderat=0;
+
+if substr(uscdrca,1, 6)='Modera' or
+substr(ctangrca,1, 6)='Modera' or
+substr(mrangrca,1, 6)='Modera' or
+substr(cvangrca,1, 6)='Modera'
+ then rmoderat=1; else rmoderat=0;
+
+if
+substr(uscdlca,1, 5)='0-29%' or
+substr(uscdlca,1, 4)='Mild' or
+substr(ctanglca,1, 5)='0-29%' or
+substr(ctanglca,1, 4)='Mild' or
+substr(mranglca,1, 5)='0-29%' or
+substr(mranglca,1, 4)='Mild' or
+substr(cvanglca,1, 5)='0-29%' or
+substr(cvanglca,1, 4)='Mild'
+ then lmild=1; else lmild=0;
+
+if
+substr(uscdrca,1, 5)='0-29%' or
+substr(uscdrca,1, 4)='Mild' or
+substr(ctangrca,1, 5)='0-29%' or
+substr(ctangrca,1, 4)='Mild' or
+substr(mrangrca,1, 5)='0-29%' or
+substr(mrangrca,1, 4)='Mild' or
+substr(cvangrca,1, 5)='0-29%'  or
+substr(cvangrca,1, 4)='Mild'
+ then rmild=1; else rmild=0;
+
+if
+substr(uscdlca,1, 5)='Acute' or
+substr(uscdlca,1, 4)='Chro' or
+substr(ctanglca,1, 5)='Acute' or
+substr(ctanglca,1, 4)='Chro' or
+substr(mranglca,1, 5)='Acute' or
+substr(mranglca,1, 4)='Chro' or
+substr(cvanglca,1, 5)='Acute' or
+substr(cvanglca,1, 4)='Chro'
+ then locc=1; else locc=0;
+
+if
+substr(uscdrca,1, 5)='Acute' or
+substr(uscdrca,1, 4)='Chro' or
+substr(ctangrca,1, 5)='Acute' or
+substr(ctangrca,1, 4)='Chro' or
+substr(mrangrca,1, 5)='Acute' or
+substr(mrangrca,1, 4)='Chro' or
+substr(cvangrca,1, 5)='Acute'  or
+substr(cvangrca,1, 4)='Chro'
+ then rocc=1; else rocc=0;
+
+if prsymp='Symptomatic' or strkside~=' ' or
+tiaside~=' ' or eyeside~=' '
+then symptm=1; else symptm=0;
+
+severe=0;
+if surgside='Left' and  lsevere=1 then severe=1;
+if surgside='Right' and  rsevere=1 then severe=1;
+
+moderat=0;
+if surgside='Left' and  lmoderat=1 then moderat=1;
+if surgside='Right' and  rmoderat=1 then moderat=1;
+
+if strksvrt='In Evolution' then evol=1; else evol=0;
+if strksvrt='Severe'
+or (prescale>=4 and strkside~=' ')
+then badstrk=1; else badstrk=0;
+
+ if rsevere=1 then rmoderat=0;
+ if rsevere=1 then  rmild=0;
+ if rsevere=0 and rmoderat=1 then rmild=0;
+
+if lsevere=1 then lmoderat=0;
+ if lsevere=1  then lmild=0;
+ if lsevere=0 and lmoderat=1 then lmild=0;
+
+if lsevere=1 or lmoderat=1 or lmild=1 then locc=0;
+
+if rsevere=1 or rmoderat=1 or rmild=1 then rocc=0;
+
+if rsevere=1 then rstencat='Sten';
+if rmoderat=1 then rstencat='Sten';
+if rmild=1 then rstencat='Sten';
+if rocc=1 then rstencat='Occuls';
+if rstencat=' ' then rstencat='Unknown';
+
+if lsevere=1 then lstencat='Sten';
+if lmoderat=1 then lstencat='Sten';
+if lmild=1 then lstencat='Sten';
+if locc=1 then lstencat='Occuls';
+if lstencat=' ' then lstencat='Unknown';
+
+if surgside='Left' and  rstencat='Sten'
+then CtrSten=1;
+
+if surgside='Right' and  lstencat='Sten'
+then CtrSten=1;
+
+if surgside='Left' and  rstencat='Occuls' then CtrOcc=1;
+if surgside='Right' and  lstencat='Occuls' then CtrOcc=1;
+
+mild=0;
+if surgside='Left' and lmild=1 then mild=1;
+if surgside='Right' and rmild=1 then mild=1; 
+
+if strkTime='< 3 weeks' then opdelay=1; else opdelay=0;
+
+if AtrlFib='Yes' then AF=1; else AF=0;
+
+if USCDUlc='Left' 
+or CTAngUlc='Left' 
+or MRAngUlc='Left' 
+or CVAngUlc='Left'
+then lUlcer=1; 
+
+if USCDUlc='Right'
+or CTAngUlc='Right'
+or MRAngUlc='Right'
+or CVAngUlc='Right'
+then rUlcer=1;
+
+Ipsiulcr=0;
+if surgside='Left' and lUlcer=1 then Ipsiulcr=1;
+if surgside='Right' and rUlcer=1 then Ipsiulcr=1;
+
+if
+substr(uscdrca,1, 4)='Chro' or
+substr(ctangrca,1, 4)='Chro' or
+substr(mrangrca,1, 4)='Chro' or
+substr(cvangrca,1, 4)='Chro' 
+then rChro=1;
+
+if
+substr(uscdlca,1, 4)='Chro' or
+substr(ctanglca,1, 4)='Chro' or
+substr(mranglca,1, 4)='Chro' or
+substr(cvanglca,1, 4)='Chro' 
+then lChro=1;
+
+Chro=0;
+if surgside='Left' and lChro=1 then Chro=1;
+if surgside='Right' and rChro=1 then Chro=1;
+
+if
+substr(uscdrca,1, 4)='Acut' or
+substr(ctangrca,1, 4)='Acut' or
+substr(mrangrca,1, 4)='Acut' or
+substr(cvangrca,1, 4)='Acut' 
+then rAcut=1;
+
+if
+substr(uscdlca,1, 4)='Acut' or
+substr(ctanglca,1, 4)='Acut' or
+substr(mranglca,1, 4)='Acut' or
+substr(cvanglca,1, 4)='Acut' 
+then lAcut=1;
+
+Acut=0;
+if surgside='Left' and lAcut=1 then Acut=1;
+if surgside='Right' and rAcut=1 then Acut=1;
+ 
+if 
+USCDClot='Left' or
+CTAngClt='Left' or
+MRAngClt='Left' or
+CVAngClt='Left'
+then lClot=1;
+
+if 
+USCDClot='Right' or
+CTAngClt='Right' or
+MRAngClt='Right' or
+CVAngClt='Right'
+then rClot=1;
+
+Clot=0;
+if surgside='Left' and lClot=1 then Clot=1;
+if surgside='Right' and rClot=1 then Clot=1;
+ 
+Apprpt='Need';
+if symptm=1 and severe=1 and evol=0 and badstrk=0 then Apprpt='A';
+if symptm=1 and severe=1 and (evol=1 or badstrk=1) then Apprpt='U';
+if symptm=0 and severe=1 and CABG=0  then Apprpt='U';
+if symptm=0 and moderat=1 and cabg=0 and
+(ctinfar=0 or mriinfar=0) then apprpt='I';
+
+if symptm=1 and severe=1 and (lifeexp=1 or mi=1
+or dement=1)
+then apprpt='I';
+srvia=0;
+if ctascler=1 or mrascler=1 or cvascler=1 then srvia=1;
+if symptm=1 and severe=1 and (redoend=1 or srvia=1) then
+apprpt='U';
+if severe=1 and vpce=1 then apprpt='U';
+
+if symptm=0 and substr(sameanes,1,4)='Diff' and severe=1 
+and (ctinfar=1 or MRIinfar=1) then apprpt='U';
+
+if symptm=0 and substr(sameanes,1,4)='Diff' and severe=1 
+and ctrocc=1 then apprpt='U';
+
+if symptm=0 and substr(sameanes,1,4)='Same' and severe=1 
+then apprpt='U';
+
+if apprpt='Need' and symptm=0 then apprpt='I'; 
+
+if symptm=1 and moderat=1 and strkSvrt ='Mild' then Apprpt='A';
+
+if symptm=1 and moderat=1 and strkSvrt='Moderate' 
+and opdelay=0 and AF=1 then Apprpt='U';
+
+if symptm=1 and moderat=1 and strksvrt='Moderate' 
+and opdelay=0 and AF=0 then Apprpt='A';
+
+if symptm=1 and moderat=1 and strksvrt='Moderate' 
+and opdelay=1 and AF=1 then Apprpt='U';
+
+if symptm=1 and moderat=1 and strksvrt='Moderate' 
+and opdelay=1 and AF=0 and Ctrocc=1 then Apprpt='U';
+
+if symptm=1 and moderat=1 and strksvrt='Moderate' 
+and opdelay=1 and AF=0 and ctrsten=1 then Apprpt='A';
+
+if symptm=1 and moderat=1 and TIATime='< 180 days' 
+and TIAType='Single' and AF=1 then Apprpt='U';
+
+if symptm=1 and moderat=1 and TIATime='< 180 days' 
+and TIAType='Single' and AF=0 and Ctrocc=1 then Apprpt='U';
+
+if symptm=1 and moderat=1 and TIATime='< 180 days' 
+and TIAType='Single' and AF=0 and ctrsten=1 then Apprpt='A';
+
+if symptm=1 and moderat=1 and TIAType='Multiple' then Apprpt='A';
+
+if symptm=1 and moderat=1 and 
+(TIATime='> 180 days' or TIATime='> 2 years')
+and TIAType='Single' and AF=1 then Apprpt='I';
+
+if symptm=1 and moderat=1 and 
+(TIATime='> 180 days' or TIATime='> 2 years')
+and TIAType='Single' and AF=0 then Apprpt='U';
+
+if symptm=1 and moderat=1 and TIAType='Crescendo' then Apprpt='A';
+
+if symptm=1 and moderat=1 and CABG=1 then Apprpt='U';
+
+if symptm=1 and moderat=1 and Ipsiulcr=1 
+and EyeTime='< 180 days' then Apprpt='A';
+
+if symptm=1 and moderat=1 and Ipsiulcr=0 
+and EyeTime='< 180 days' then Apprpt='U';
+
+if symptm=1 and moderat=1 and Eyeevnt='Multiple' then Apprpt='A';
+
+if symptm=1 and moderat=1 and 
+(EyeTime='> 180 days' or EyeTime='> 2 years')
+and Eyeevnt='Single' and AF=1 then Apprpt='I';
+
+if symptm=1 and moderat=1 and 
+(EyeTime='> 180 days' or EyeTime='> 2 years')
+and Eyeevnt='Single' and AF=0 then Apprpt='U';
+
+if symptm=1 and mild=1 and Ipsiulcr=1 and 
+(Eyeevnt='Multiple' or TIAType='Multiple') then Apprpt='U';
+
+if symptm=1 and mild=1 and Ipsiulcr=1 and TIAType='Crescendo' 
+then Apprpt='U';
+
+if symptm=1 and mild=1 then Apprpt='I';
+
+if symptm=1 and Chro=1 then Apprpt='I';
+
+if symptm=1 and Acut=1 and 
+(strksvrt='Moderate' or strksvrt ='Mild' or 
+TIAType='Multiple' or TIAType='Single' or Eyeevnt='Single')
+then Apprpt='U';
+
+if symptm=1 and Acut=1 and Eyeevnt='Multiple' then Apprpt='I';
+
+if symptm=1 and Clot=1 and 
+(TIAType='Multiple' or TIAType='Single' or Eyeevnt='Multiple')
+then Apprpt='A';
+
+if symptm=1 and Clot=1 and Eyeevnt='Single' then Apprpt='U';
+
+run;
+
+title1 'Defining Appropriatness';
+title2 'apprpt=A appropriate, U=uncertain, I=inappropriate, Need = need to be defined';
+
+proc freq data=mydata;
+table apprpt;
+run;

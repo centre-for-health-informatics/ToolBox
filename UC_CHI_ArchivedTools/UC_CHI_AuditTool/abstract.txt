@@ -1,0 +1,7 @@
+The objective of this project was to update appropriateness ratings for carotid endarterectomy using the best clinical evidence and to develop a tool to audit the procedure’s use. A nine-member expert panel drawn from all the Canadian Specialist societies that are involved in the care of patients with carotid artery disease, used the RAND Appropriateness Methodology to rate scenarios where carotid endarterectomy may be performed. A 9-point rating scale was used that permits the categorization of the use of carotid endarterectomy as appropriate, uncertain, or inappropriate. A descriptive analysis was undertaken of the final results of the panel meeting. A database and code were then developed to rate all carotid endarterectomies performed in a Western Canadian Health region from 1997 to 2001. These expert panel ratings, based on the best evidence currently available, provide a comprehensive and updated guide to appropriate use of carotid endarterectomy. The resulting audit tool can be downloaded from the Internet and immediately used for hospital audits of carotid endarterectomy appropriateness. Instructions on using the Database and SAS code.
+
+1) Ensure that the Database (PTMSCEDB.MDE) is located in folder D:/temp
+
+2) Enter the data from all cases into the Microsoft Access® database following the prompts as necessary.
+
+3) Run the SAS code
